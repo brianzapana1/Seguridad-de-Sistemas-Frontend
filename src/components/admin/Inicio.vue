@@ -1,36 +1,38 @@
 <template>
   <div class="admin-dashboard">
     <h1 class="welcome-message">Bienvenido al Panel de Administración</h1>
-    <div class="admin-info">
+
+    <div v-if="authStore.tienePermiso('admin', 'leer')" class="admin-info">
       <h2>Información del Administrador</h2>
-      <form v-if="isEditing" @submit.prevent="guardarDatosAdmin" class="edit-form">
+      
+      <form v-if="isEditing && authStore.tienePermiso('admin', 'actualizar')" @submit.prevent="guardarDatosAdmin" class="edit-form">
         <div class="form-group">
           <label for="nombreCompleto">Nombre Completo</label>
-          <input v-model="admin.nombreCompleto" type="text" id="nombreCompleto" placeholder="Nombre completo" required />
+          <input v-model="admin.nombreCompleto" type="text" id="nombreCompleto" required />
         </div>
         <div class="form-group">
           <label for="correo">Correo Electrónico</label>
-          <input v-model="admin.correo" type="email" id="correo" placeholder="Correo electrónico" required />
+          <input v-model="admin.correo" type="email" id="correo" required />
         </div>
         <div class="form-group">
           <label for="telefono">Teléfono</label>
-          <input v-model="admin.telefono" type="text" id="telefono" placeholder="Teléfono" required />
+          <input v-model="admin.telefono" type="text" id="telefono" required />
         </div>
         <div class="form-group">
           <label for="direccion">Dirección</label>
-          <input v-model="admin.direccion" type="text" id="direccion" placeholder="Dirección" required />
+          <input v-model="admin.direccion" type="text" id="direccion" required />
         </div>
         <div class="form-group">
           <label for="historial_acad">Historial Académico</label>
-          <textarea v-model="admin.historial_acad" id="historial_acad" placeholder="Historial académico" required></textarea>
+          <textarea v-model="admin.historial_acad" id="historial_acad" required></textarea>
         </div>
         <div class="form-group">
           <label for="nombre_usuario">Nombre de Usuario</label>
-          <input v-model="admin.nombre_usuario" type="text" id="nombre_usuario" placeholder="Nombre de usuario" disabled />
+          <input v-model="admin.nombre_usuario" type="text" id="nombre_usuario" disabled />
         </div>
         <div class="form-group">
           <label for="rol">Rol</label>
-          <input v-model="admin.rol" type="text" id="rol" placeholder="Rol" disabled />
+          <input v-model="admin.rol" type="text" id="rol" disabled />
         </div>
         <button class="save-button" type="submit">Guardar cambios</button>
       </form>
@@ -38,130 +40,38 @@
       <div v-else>
         <table class="admin-info-table">
           <tbody>
-            <tr>
-              <td><strong>Nombre Completo:</strong></td>
-              <td>{{ admin.nombreCompleto }}</td>
-            </tr>
-            <tr>
-              <td><strong>Correo Electrónico:</strong></td>
-              <td>{{ admin.correo }}</td>
-            </tr>
-            <tr>
-              <td><strong>Teléfono:</strong></td>
-              <td>{{ admin.telefono }}</td>
-            </tr>
-            <tr>
-              <td><strong>Dirección:</strong></td>
-              <td>{{ admin.direccion }}</td>
-            </tr>
-            <tr>
-              <td><strong>Historial Académico:</strong></td>
-              <td>{{ admin.historial_acad }}</td>
-            </tr>
-            <tr>
-              <td><strong>Nombre de Usuario:</strong></td>
-              <td>{{ admin.nombre_usuario }}</td>
-            </tr>
-            <tr>
-              <td><strong>Rol:</strong></td>
-              <td>{{ admin.rol }}</td>
-            </tr>
+            <tr><td><strong>Nombre Completo:</strong></td><td>{{ admin.nombreCompleto }}</td></tr>
+            <tr><td><strong>Correo Electrónico:</strong></td><td>{{ admin.correo }}</td></tr>
+            <tr><td><strong>Teléfono:</strong></td><td>{{ admin.telefono }}</td></tr>
+            <tr><td><strong>Dirección:</strong></td><td>{{ admin.direccion }}</td></tr>
+            <tr><td><strong>Historial Académico:</strong></td><td>{{ admin.historial_acad }}</td></tr>
+            <tr><td><strong>Nombre de Usuario:</strong></td><td>{{ admin.nombre_usuario }}</td></tr>
+            <tr><td><strong>Rol:</strong></td><td>{{ admin.rol }}</td></tr>
           </tbody>
         </table>
-        <button class="edit-button" @click="isEditing = true">Editar Datos</button>
+        
+        <button v-if="authStore.tienePermiso('admin', 'actualizar')" class="edit-button" @click="isEditing = true">
+          Editar Datos
+        </button>
       </div>
     </div>
   </div>
 </template>
 
-
-
-
 <script>
-import axios from 'axios';
+import { useAuthStore } from '@/stores/authStore';
+import { useAdmin } from '@/composables/useAdmin';
 
 export default {
-  data() {
-    return {
-      isEditing: false, // Controla el modo de edición
-      admin: {
-        nombreCompleto: '',
-        correo: '',
-        telefono: '',
-        direccion: '',
-        historial_acad: '',
-        nombre_usuario: '',
-        rol: '',
-      },
-    };
-  },
-  methods: {
-    async obtenerDatosAdmin() {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.error('Token no encontrado. Redirigiendo a inicio de sesión...');
-          this.$router.push('/login');
-          return;
-        }
-
-        const response = await axios.get('http://localhost:3001/api/auth/admin/info', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const data = response.data;
-        this.admin.nombreCompleto = `${data.persona.Nombre} ${data.persona.Seg_Nombre || ''} ${data.persona.Tercer_Nombre || ''} ${data.persona.Apellido_Paterno} ${data.persona.Apellido_Materno}`.trim();
-        this.admin.correo = data.persona.Correo;
-        this.admin.telefono = data.persona.Telefono;
-        this.admin.direccion = data.persona.Direccion;
-        this.admin.historial_acad = data.persona.Historial_acad;
-        this.admin.nombre_usuario = data.usuario.Nombre_usuario;
-        this.admin.rol = data.usuario.Rol;
-
-      } catch (error) {
-        console.error('Error al obtener la información del administrador:', error);
-        if (error.response && error.response.status === 401) {
-          this.$router.push('/login');
-        }
-      }
-    },
-    async guardarDatosAdmin() {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.error('Token no encontrado. Redirigiendo a inicio de sesión...');
-          this.$router.push('/login');
-          return;
-        }
-
-        const response = await axios.put('http://localhost:3001/api/auth/admin/update', {
-          Nombre: this.admin.nombreCompleto.split(' ')[0],
-          Seg_Nombre: this.admin.nombreCompleto.split(' ')[1] || null,
-          Tercer_Nombre: this.admin.nombreCompleto.split(' ')[2] || null,
-          Apellido_Paterno: this.admin.nombreCompleto.split(' ')[3],
-          Apellido_Materno: this.admin.nombreCompleto.split(' ')[4] || null,
-          Correo: this.admin.correo,
-          Telefono: this.admin.telefono,
-          Direccion: this.admin.direccion,
-          Historial_acad: this.admin.historial_acad
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        console.log('Datos guardados correctamente:', response.data);
-        alert('Los cambios se han guardado exitosamente');
-        this.isEditing = false; // Cambiar al modo de solo lectura
-      } catch (error) {
-        console.error('Error al guardar los datos del administrador:', error);
-        alert('Hubo un error al guardar los datos');
-      }
-    },
-  },
-  created() {
-    this.obtenerDatosAdmin(); // Llamar a la función al crear el componente
-  },
+  setup() {
+    const authStore = useAuthStore();
+    const { admin, isEditing, obtenerDatosAdmin, guardarDatosAdmin } = useAdmin();
+    
+    return { authStore, admin, isEditing, obtenerDatosAdmin, guardarDatosAdmin };
+  }
 };
 </script>
+
 
 
 

@@ -4,7 +4,7 @@
       <div class="logo">
         <div class="contenedor-logo">
           <router-link to="/"> 
-            <img src="../../../public/UAC Pucarani 1.2 (1).png" alt="Logo UAC" /> 
+            <img src="/UAC Pucarani 1.2 (1).png" alt="Logo UAC" /> 
           </router-link>
         </div>
       </div>
