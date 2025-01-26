@@ -1,13 +1,13 @@
-import { ref } from 'vue';
-import { useAuthStore } from '@/stores/authStore';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "vue-router";
 
 export function useAuth() {
     const authStore = useAuthStore();
     const router = useRouter();
-    
-    const nombreUsuario = ref('');
-    const contrasena = ref('');
+
+    const nombreUsuario = ref("");
+    const contrasena = ref("");
     const mostrarContrasena = ref(false);
     const mostrarMensaje = ref(false);
 
@@ -15,8 +15,8 @@ export function useAuth() {
         mostrarMensaje.value = false;
 
         if (!nombreUsuario.value || !contrasena.value) {
-            authStore.mensaje = 'Por favor, completa todos los campos.';
-            authStore.mensajeTipo = 'error';
+            authStore.mensaje = "Por favor, completa todos los campos.";
+            authStore.mensajeTipo = "error";
             mostrarMensaje.value = true;
             return;
         }
@@ -24,10 +24,13 @@ export function useAuth() {
         await authStore.login(nombreUsuario.value, contrasena.value);
         mostrarMensaje.value = true;
 
-        if (authStore.token) {
+        // ✅ Obtener sesión para verificar autenticación
+        await authStore.obtenerUsuarioAutenticado();
+
+        if (authStore.isAuthenticated) {
             setTimeout(() => {
-                router.push('/');
-            }, 3000);
+                router.push("/"); // ✅ Redirige al dashboard en vez de "/"
+            }, 1500);
         }
     };
 

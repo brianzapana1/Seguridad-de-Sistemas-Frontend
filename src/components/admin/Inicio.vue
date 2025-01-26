@@ -2,7 +2,7 @@
   <div class="admin-dashboard">
     <h1 class="welcome-message">Bienvenido al Panel de Administración</h1>
 
-    <div v-if="authStore.tienePermiso('admin', 'leer')" class="admin-info">
+    <div v-if="authStore.tieneAlgunPermiso" class="admin-info">
       <h2>Información del Administrador</h2>
       
       <form v-if="isEditing && authStore.tienePermiso('admin', 'actualizar')" @submit.prevent="guardarDatosAdmin" class="edit-form">
@@ -50,7 +50,7 @@
           </tbody>
         </table>
         
-        <button v-if="authStore.tienePermiso('admin', 'actualizar')" class="edit-button" @click="isEditing = true">
+        <button v-if="authStore.tieneAlgunPermiso" class="edit-button" @click="isEditing = true">
           Editar Datos
         </button>
       </div>
@@ -61,16 +61,29 @@
 <script>
 import { useAuthStore } from '@/stores/authStore';
 import { useAdmin } from '@/composables/useAdmin';
+import { useRouter } from 'vue-router';
 
 export default {
   setup() {
     const authStore = useAuthStore();
+    const router = useRouter();
     const { admin, isEditing, obtenerDatosAdmin, guardarDatosAdmin } = useAdmin();
     
+    // ✅ Solo redirigir si no tiene ningún permiso asignado
+    if (!authStore.tieneAlgunPermiso) {
+      console.warn("⚠️ No tienes permisos. Redirigiendo...");
+      console.log("Permisos actuales:", authStore.permisos);  // 🔍 Verifica si hay permisos
+      router.push('/');
+    }
+
+
+
     return { authStore, admin, isEditing, obtenerDatosAdmin, guardarDatosAdmin };
   }
 };
+
 </script>
+
 
 
 

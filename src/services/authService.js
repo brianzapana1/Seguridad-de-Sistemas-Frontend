@@ -1,18 +1,16 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'http://localhost:3001/api/auth';
+const api = axios.create({
+  baseURL: "http://localhost:3001/api/auth", // Asegúrate de que sea la URL correcta del backend
+  withCredentials: true, // 🔥 Permite enviar y recibir cookies automáticamente
+});
 
-export const authService = {
-    async login(nombreUsuario, contrasena) {
-        try {
-            const response = await axios.post(`${API_URL}/login`, {
-                Nombre_usuario: nombreUsuario,
-                Contrasenia: contrasena,
-            });
+const authService = {
+    login: (Nombre_usuario, Contrasenia) => api.post("/login", { Nombre_usuario, Contrasenia }),
+    getUserInfo: () => api.get("/user-info"),  // ✅ RUTA CORRECTA
+    logout: () => api.post("/logout"),
+  };
+  
+  
 
-            return response.data; // Devuelve el token y el rol
-        } catch (error) {
-            throw error.response?.data?.error || 'Error en la autenticación';
-        }
-    }
-};
+export default authService;

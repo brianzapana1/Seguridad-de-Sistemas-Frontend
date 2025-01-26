@@ -1,51 +1,83 @@
-import { defineStore } from 'pinia';
-import { authService } from '@/services/authService';
+import { defineStore } from "pinia";
+import authService from "@/services/authService";
 
-export const useAuthStore = defineStore('auth', {
+export const useAuthStore = defineStore("auth", {
   state: () => ({
-    token: sessionStorage.getItem('token') || null, 
-    user: sessionStorage.getItem('nombreUsuario') || null, 
-    rol: sessionStorage.getItem('rol') || null,
-    mensaje: '',  // ✅ Agregado mensaje
-    mensajeTipo: ''  // ✅ Agregado tipo de mensaje (éxito/error)
+    user: null,
+    roles: [],
+    permisos: [],
+    mensaje: "",
+    mensajeTipo: "",
   }),
+
   getters: {
-    isAuthenticated: (state) => !!state.token,
-    isAdmin: (state) => state.rol === 'Admin',
-    isUsuario: (state) => state.rol === 'Usuario',
+    isAuthenticated: (state) => !!state.user,
+
+    tienePermiso: (state) => (modulo, permiso) => {
+      const mod = state.permisos.find((p) => p.modulo === modulo);
+      console.log("Verificando permisos:", { modulo, permiso, mod });
+      return mod ? mod.permisos[permiso] : false;
+    },
+
+    tieneAlgunPermiso: (state) => {
+      console.log("🔍 Verificando si el usuario tiene permisos:", state.permisos);
+      return state.permisos.length > 0;
+    },
+    
+    
+
+    obtenerRoles: (state) => state.roles.map((rol) => rol.Nombre),
   },
+
   actions: {
     async login(nombreUsuario, contrasena) {
       try {
-        const data = await authService.login(nombreUsuario, contrasena);
-        if (!data.token || !data.rol) throw new Error('Respuesta inválida');
-
-        // ✅ Guardamos datos en el estado
-        this.token = data.token;
-        this.user = nombreUsuario;
-        this.rol = data.rol;
-        sessionStorage.setItem('token', data.token);
-        sessionStorage.setItem('nombreUsuario', nombreUsuario);
-        sessionStorage.setItem('rol', data.rol);
-
-        // ✅ Mensaje de éxito
-        this.mensaje = 'Inicio de sesión exitoso';
-        this.mensajeTipo = 'exito';
+        await authService.login(nombreUsuario, contrasena);
+        
+        // 🔥 Esperar un momento antes de obtener la sesión (evita race conditions)
+        await new Promise(resolve => setTimeout(resolve, 500));
+    
+        // 🔥 Llamar a obtenerUsuarioAutenticado() después del login
+        await this.obtenerUsuarioAutenticado();
+    
+        this.mensaje = "Inicio de sesión exitoso";
+        this.mensajeTipo = "exito";
       } catch (error) {
-        // ✅ Mensaje de error
-        this.mensaje = error || 'Error en la autenticación';
-        this.mensajeTipo = 'error';
+        console.error("Error en autenticación:", error);
+        this.mensaje = error.response?.data?.message || "Error en la autenticación";
+        this.mensajeTipo = "error";
       }
     },
-    logout() {
-      this.token = null;
-      this.user = null;
-      this.rol = null;
-      sessionStorage.clear();
+    
 
-      // ✅ Mensaje de sesión cerrada
-      this.mensaje = 'Sesión cerrada correctamente';
-      this.mensajeTipo = 'exito';
-    }
+    async obtenerUsuarioAutenticado() {
+      try {
+        const response = await authService.getUserInfo();
+        console.log("✅ Datos del usuario obtenidos:", response.data);
+        
+        this.user = response.data.usuario.Nombre_usuario;
+        this.roles = [response.data.usuario.Rol];
+        this.permisos = response.data.permisos;
+    
+        console.log("🔍 Permisos asignados al usuario:", this.permisos);
+    
+      } catch (error) {
+        console.warn("⚠️ No hay sesión activa:", error);
+        this.logout();
+      }
+    },
+    
+
+    async logout() {
+      try {
+        await authService.logout();
+      } catch (error) {
+        console.warn("⚠️ Error cerrando sesión:", error);
+      } finally {
+        this.user = null;
+        this.roles = [];
+        this.permisos = [];
+      }
+    },
   },
 });

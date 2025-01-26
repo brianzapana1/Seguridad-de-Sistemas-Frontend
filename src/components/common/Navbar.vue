@@ -37,22 +37,27 @@
             <router-link to="/eventos-profesionales">Eventos de actualización <br> profesional</router-link>
           </div>
         </div>
-        
+
         <!-- Verificación de autenticación usando Pinia -->
         <div v-if="authStore.isAuthenticated" class="contenedor-usuario">
-          <div v-if="authStore.isAdmin" class="enlace-desplegable">
+          
+          <!-- ✅ Solo muestra "Administrar" si el usuario tiene permisos asignados -->
+          <div v-if="authStore.tieneAlgunPermiso" class="enlace-desplegable">
             <span class="no-clic">Bienvenido(a), <br> {{ authStore.user }} <i class="arrow-down"></i></span>
             <div class="submenu">
               <router-link to="/admin">Administrar</router-link>
               <router-link to="/" @click.native="authStore.logout">Cerrar sesión</router-link>
             </div>
           </div>
+
+          <!-- ✅ Si no tiene permisos, solo muestra su nombre y cerrar sesión -->
           <div v-else class="enlace-desplegable">
             <span class="no-clic">Bienvenido(a), <br> {{ authStore.user }} <i class="arrow-down"></i></span>
             <div class="submenu">
               <router-link to="/" @click.native="authStore.logout">Cerrar sesión</router-link>
             </div>
           </div>
+
         </div>
         
         <div v-else class="contenedor-iniciar-sesion">
@@ -73,6 +78,8 @@ export default {
   }
 };
 </script>
+
+
 
 
 <style scoped>
