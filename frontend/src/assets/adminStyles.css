@@ -1,0 +1,170 @@
+/* 📌 Estilos generales del Panel de Administración */
+.admin-dashboard {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+
+    /* 💡 Separación del Navbar */
+    margin-left: 320px;  /* Ajusta este valor según el ancho del navbar */
+}
+
+/* 📌 Responsividad: Ajuste del margen en pantallas más pequeñas */
+@media (max-width: 1024px) {
+    .admin-dashboard {
+        margin-left: 260px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-dashboard {
+        margin-left: 100px;
+        max-width: 90%;
+    }
+}
+
+.admin-dashboard:hover {
+    transform: translateY(-5px);
+}
+
+/* 📌 Encabezado */
+.welcome-message {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+    color: #002f5b;
+    margin-bottom: 20px;
+}
+
+/* 📌 Tarjetas de contenido */
+.admin-info {
+    background-color: #f9f9f9;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    text-align: left;
+}
+
+.admin-info h2 {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 📌 Formularios */
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto; /* Centrar formulario */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 1.1em;
+    color: #333;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 12px;
+    font-size: 1em;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: white;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease;
+    width: 100%;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #4b9ce2;
+    outline: none;
+}
+
+/* 📌 Botones */
+.save-button,
+.delete-button {
+    padding: 12px 18px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 90%;
+    max-width: 600px;
+    display: block;
+    margin: 20px auto; /* Centrar botones */
+}
+
+.save-button {
+    background: #4b9ce2;
+    color: white;
+}
+
+.save-button:hover {
+    background: #3a80c1;
+}
+
+.delete-button {
+    background: #d9534f;
+    color: white;
+}
+
+.delete-button:hover {
+    background: #c9302c;
+}
+
+/* 📌 Tablas */
+.admin-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.admin-info-table th,
+.admin-info-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.admin-info-table th {
+    background: #002f5b;
+    color: white;
+    font-weight: bold;
+}
+
+.admin-info-table tr:hover {
+    background: #f1f1f1;
+}
+
+/* 📌 Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-dashboard {
+    animation: fadeIn 0.8s ease-in-out;
+}

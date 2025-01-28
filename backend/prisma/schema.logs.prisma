@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client-logs"  // ✅ Correcto
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL_LOGS")
+}
+
+
+model Logs_Sistema {
+  idLog       Int      @id @default(autoincrement())
+  idUsuario   Int
+  Tipo_evento String   @db.VarChar(50)
+  Descripcion String?
+  Fecha       DateTime 
+  ipUsuario   String   @db.VarChar(50)
+  Nivel       String   @db.VarChar(50)
+}
+
+model Logs_Acciones {
+  idLog           Int      @id @default(autoincrement())
+  idUsuario       Int
+  Tipo_Accion     String   @db.VarChar(50)
+  Tabla_Afectada  String   @db.VarChar(100)
+  Registro_Antiguo Json?
+  Registro_Nuevo   Json?
+  Fecha           DateTime 
+}
+
+model Logs_Eliminados {
+  idLog             Int      @id @default(autoincrement())
+  idUsuario        Int
+  Tabla_Afectada  String   @db.VarChar(100)
+  Registro_Eliminado Json
+  Fecha           DateTime 
+  Motivo          Int
+  Rollback        Boolean  @default(false)
+  Fecha_restauracion DateTime?
+}
+
+model Logs_Permissions {
+  idLog                Int      @id @default(autoincrement())
+  idAdministrador_mod  Int
+  idUsuario           Int
+  idModulo            Int
+  Permiso             String   @db.VarChar(50)
+  Estado              Boolean
+  Fecha               DateTime 
+}
+
+model Logs_Passwords {
+  idLog                 Int      @id @default(autoincrement())
+  idUsuario             Int
+  Password_anterior_hash String   @db.VarChar(255)
+  Fecha_cambio         DateTime 
+  Motivo               String   @db.VarChar(100)
+}
+
+model Historico_Passwords {
+  idHistorico   Int      @id @default(autoincrement())
+  idUsuario     Int
+  Password_hash String   @db.VarChar(255)
+  Fecha_cambio DateTime 
+  Motivo        String   @db.VarChar(100)
+}
+
+model Logs_Intentos_Login {
+  idIntento      Int      @id @default(autoincrement())
+  idUsuario      Int
+  ipUsuario      String   @db.VarChar(50)
+  Fecha_intento  DateTime 
+  Exitoso        Boolean
+  Motivo_fallo   String?  @db.VarChar(255)
+  Numero_intento Int
+}
+
+model Logs_Acceso_Modulo {
+  idLog       Int      @id @default(autoincrement())
+  idUsuario   Int
+  Modulo      String   @db.VarChar(50)
+  Accion      String   @db.VarChar(50)
+  Fecha_acceso DateTime 
+}
