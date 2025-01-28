@@ -23,13 +23,18 @@
         <li class="navbar-item">
           <a href="#" class="navbar-enlace" @click.prevent="alternarMenuUsuarios">
             👥 Gestión de Usuarios
-            <span :class="['flecha', { 'flecha-arriba': usuariosAbierto, 'flecha-abajo': !usuariosAbierto }]"></span>
+          <span :class="['flecha', { 'flecha-arriba': usuariosAbierto, 'flecha-abajo': !usuariosAbierto }]"></span>
           </a>
           <ul v-show="usuariosAbierto" class="sub-menu">
-            <li><router-link to="/admin/persona" class="navbar-enlace">👤 Persona</router-link></li>
-            <li><router-link to="/admin/usuario" class="navbar-enlace">👥 Usuario</router-link></li>
-          </ul>
-        </li>
+            <li><router-link to="/admin/usuario/registrar" class="navbar-enlace">📝 Registrar Usuario</router-link></li>
+            <li><router-link to="/admin/usuario/roles" class="navbar-enlace">⚖️ Asignar Roles</router-link></li>
+            <li><router-link to="/admin/usuario/permisos" class="navbar-enlace">🔐 Asignar Permisos</router-link></li>
+            <li><router-link to="/admin/usuario/visualizar" class="navbar-enlace">👀 Ver Usuarios</router-link></li>
+            <li><router-link to="/admin/usuario/editar" class="navbar-enlace">✏️ Editar Usuario</router-link></li>
+            <li><router-link to="/admin/usuario/eliminar" class="navbar-enlace">🗑️ Eliminar Usuario</router-link></li>
+            </ul>
+          </li>
+
 
         <!-- Gestión de Contenido -->
         <li class="navbar-item">
